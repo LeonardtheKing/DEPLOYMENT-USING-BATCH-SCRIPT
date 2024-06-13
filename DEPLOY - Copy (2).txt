@@ -1,0 +1,44 @@
+@echo off
+
+:: Define variables
+SET PROJECT_PATH=C:\Users\Izuchukwu.Okorie\Desktop\Newfolder2\I-WEMA-SAMUEL-TAKE-NOTE - Copy\iwema-api\src\IWema.Api
+SET PUBLISH_DIR=C:\inetpub\wwwroot\IWEMA
+SET SITE_NAME=iwema
+SET APP_POOL_NAME=iwema
+
+set source=C:\Users\Izuchukwu.Okorie\Desktop\NEWFOLDER2\I-WEMA-SAMUEL-TAKE-NOTE-Copy\iwema-api\src\IWema.Api
+set dest=C:\inetpub\wwwroot
+
+:: Pull and checkout remote code from development branch
+echo Pulling latest code from development branch...
+cd "%PROJECT_PATH%"
+
+:: Restore packages
+echo Restoring packages...
+dotnet restore
+
+:: Build and test the project
+echo Building the project...
+dotnet build -c Release
+
+echo Running tests...
+dotnet test
+
+
+:: Publish to a folder
+echo Publishing project...
+dotnet publish -c Release -o "%PUBLISH_DIR%"
+
+:: Copy the published files to the IIS site directory
+echo Copying files to the IIS site directory...
+ROBOCOPY %source% %dest% /S /E /COPYALL /R:1000000 /W:30 /MIR
+
+
+
+
+:: Recycle the app pool
+echo Recycling app pool...
+"C:\Windows\System32\inetsrv\appcmd.exe" recycle apppool /apppool.name:"%APP_POOL_NAME%"
+
+echo Deployment completed successfully.
+pause
