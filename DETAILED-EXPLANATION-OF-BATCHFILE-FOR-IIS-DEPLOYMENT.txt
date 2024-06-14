@@ -1,0 +1,56 @@
+1.@echo off
+
+Disables displaying subsequent commands in the command prompt.
+
+2. :: Define variables
+ SET PROJECT_PATH=C:\Users\Izuchukwu.Okorie\Desktop\Newfolder2\I-WEMA-SAMUEL-TAKE-NOTE - Copy\iwema-api\src\IWema.Api
+SET PUBLISH_DIR=C:\inetpub\wwwroot\IWEMA
+SET SITE_NAME=iwema
+SET APP_POOL_NAME=iwema
+
+ Sets up variables for project path, publish directory, site name, and application pool name.
+
+3. set source= and set dest=
+set source=C:\Users\Izuchukwu.Okorie\Desktop\NEWFOLDER2\I-WEMA-SAMUEL-TAKE-NOTE-Copy\iwema-api\src\IWema.Api
+set dest=C:\inetpub\wwwroot
+
+4.:: Pull and checkout remote code from development branch
+git pull origin development
+git checkout development
+echo Pulling latest code from development branch...
+cd "%PROJECT_PATH%"
+
+Pulls latest changes and switches to the development branch, then changes directory to the project path.
+
+5.:: Restore packages
+
+echo Restoring packages...
+dotnet restore
+Restores NuGet packages required by the project.
+
+6.:: Build and test the project
+echo Building the project...
+dotnet build -c Release
+
+echo Running tests...
+dotnet test
+Builds and tests the project in Release configuration.
+
+7. :: Publish to a folder
+echo Publishing project...
+dotnet publish -c Release -o "%PUBLISH_DIR%"
+
+8. :: Copy the published files to the IIS site directory
+echo Copying files to the IIS site directory...
+ROBOCOPY %source% %dest% /S /E /COPYALL /R:1000000 /W:30 /MIR
+Copies published files to the IIS site directory using Robocopy.
+
+9. :: Recycle the app pool
+echo Recycling app pool...
+"C:\Windows\System32\inetsrv\appcmd.exe" recycle apppool /apppool.name:"%APP_POOL_NAME%"
+Recycles the specified IIS application pool.
+
+10. echo Deployment completed successfully.
+
+pause
+Displays success message and pauses execution.
